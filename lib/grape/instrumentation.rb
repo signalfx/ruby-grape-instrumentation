@@ -1,4 +1,4 @@
-require "grape/instrumentation/version"
+require 'grape/instrumentation/version'
 
 module Grape
   module Instrumentation
