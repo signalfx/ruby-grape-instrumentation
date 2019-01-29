@@ -7,6 +7,7 @@ Gem::Specification.new do |spec|
   spec.version       = Grape::Instrumentation::VERSION
   spec.authors       = ['Ashwin Chandrasekar']
   spec.email         = ['achandrasekar@signalfx.com']
+  spec.license       = 'Apache-2.0'
 
   spec.summary       = 'OpenTracing instrumentation for Grape'
   spec.homepage      = 'https://github.com/signalfx/ruby-grape-instrumentation'
