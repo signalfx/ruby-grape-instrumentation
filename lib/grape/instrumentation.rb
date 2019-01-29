@@ -17,12 +17,12 @@ module Grape
       format_response.grape
     ].freeze
 
-    attr_accessor :tracer
-
     class << self
       COMMON_TAGS = {
         'component' => 'ruby-grape',
       }.freeze
+
+      attr_accessor :tracer
 
       def instrument(tracer: OpenTracing.global_tracer, parent_span: nil)
         @tracer = tracer
