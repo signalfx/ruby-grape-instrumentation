@@ -17,15 +17,22 @@ RSpec.describe Grape::Instrumentation do
     ::Test::API
   end
 
-  context 'instrumented API' do
+  context 'when instrumenting an API' do
     let(:path) { '/test/test' }
-    let(:common_tags) { { 'component' => 'ruby-grape', 'request.id' => anything, 'http.method' => 'GET', 'http.url' => path } }
+    let(:common_tags) do
+      { 'component' => 'ruby-grape',
+        'request.id' => anything,
+        'http.method' => 'GET',
+        'http.url' => path }
+    end
 
-    context 'getting an endpoint' do
-      before { described_class.instrument(tracer: tracer) }
+    context 'when getting an endpoint' do
+      before do
+        described_class.instrument(tracer: tracer)
+        get path
+      end
+
       after { described_class.uninstrument }
-
-      before { get path }
 
       it 'adds spans when processing an endpoint' do
         expect(last_response.status).to eq 200
@@ -63,16 +70,20 @@ RSpec.describe Grape::Instrumentation do
       end
     end
 
-    context 'getting an endpoint with parent span' do
+    context 'when getting an endpoint with parent span' do
       let(:span) { tracer.start_span('test_span') }
+
       before { described_class.instrument(tracer: tracer, parent_span: span) }
+
       after { described_class.uninstrument }
 
       it 'adds the correct parent id for each span' do
         get path
 
+        span_id = span.context.span_id
+
         tracer.spans.each do |s|
-          expect(s.context.parent_id).to eq span.context.span_id unless s.operation_name == span.operation_name
+          expect(s.context.parent_id).to eq span_id unless s.operation_name == span.operation_name
         end
       end
     end

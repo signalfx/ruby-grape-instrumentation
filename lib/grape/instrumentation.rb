@@ -66,11 +66,16 @@ module Grape
           'request.id' => event.transaction_id
         }.merge(COMMON_TAGS)
 
-        span = @tracer.start_span("#{event.name}", tags: tags, child_of: @parent_span, start_time: event.time, finish_on_close: false)
+        span = @tracer.start_span(event.name.to_s,
+                                  tags: tags,
+                                  child_of: @parent_span,
+                                  start_time: event.time,
+                                  finish_on_close: false)
 
         # tag relevant information from the event payload
         tag_endpoint(span, event.payload[:endpoint]) if event.payload[:endpoint]
-        tag_error(span, event.payload[:exception_object]) if event.payload[:exception] && event.payload[:exception_object]
+        tag_error(span, event.payload[:exception_object]) if event.payload[:exception] &&
+                                                             event.payload[:exception_object]
 
         span.finish(end_time: event.end)
       end
