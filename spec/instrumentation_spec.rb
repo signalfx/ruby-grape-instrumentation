@@ -87,5 +87,24 @@ RSpec.describe Grape::Instrumentation do
         end
       end
     end
+
+    context 'when getting an endpoing with a parent span block' do
+      let(:span) { tracer.start_span('test_span') }
+      let(:parent_span) { ->(_) { span } }
+
+      before { described_class.instrument(tracer: tracer, parent_span: parent_span) }
+
+      after { described_class.uninstrument }
+
+      it 'adds the correct parent id for each span' do
+        get path
+
+        span_id = span.context.span_id
+
+        tracer.spans.each do |s|
+          expect(s.context.parent_id).to eq span_id unless s.operation_name == span.operation_name
+        end
+      end
+    end
   end
 end

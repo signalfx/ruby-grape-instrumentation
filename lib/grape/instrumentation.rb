@@ -66,9 +66,10 @@ module Grape
           'request.id' => event.transaction_id
         }.merge(COMMON_TAGS)
 
+        parent = @parent_span.respond_to?(:call) ? @parent_span.call(event.payload) : @parent_span
         span = @tracer.start_span(event.name.to_s,
                                   tags: tags,
-                                  child_of: @parent_span,
+                                  child_of: parent,
                                   start_time: event.time,
                                   finish_on_close: false)
 
