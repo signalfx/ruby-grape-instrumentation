@@ -24,11 +24,12 @@ module Grape
         'component' => 'ruby-grape',
       }.freeze
 
-      def instrument(tracer: OpenTracing.global_tracer)
+      def instrument(tracer: OpenTracing.global_tracer, parent_span: nil)
         @tracer = tracer
+        @parent_span = parent_span
         @subscriber_mutex = Mutex.new
         @subscribers = []
-        
+
         @subscriber_mutex.synchronize do
           add_subscribers
         end
@@ -65,7 +66,7 @@ module Grape
           'request.id' => event.transaction_id
         }.merge(COMMON_TAGS)
 
-        span = @tracer.start_span("#{event.name}", tags: tags, start_time: event.time, finish_on_close: false)
+        span = @tracer.start_span("#{event.name}", tags: tags, child_of: @parent_span, start_time: event.time, finish_on_close: false)
 
         # tag relevant information from the event payload
         tag_endpoint(span, event.payload[:endpoint]) if event.payload[:endpoint]
