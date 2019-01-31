@@ -30,35 +30,35 @@ module Grape
         @subscriber_mutex = Mutex.new
         @subscribers = []
 
-        @subscriber_mutex.synchronize do
-          add_subscribers
-        end
+        add_subscribers
       end
 
       def uninstrument
-        @subscriber_mutex.synchronize do
-          clear_subscribers
-        end
+        clear_subscribers
       end
 
       def add_subscribers
         clear_subscribers unless @subscribers.empty?
 
-        NOTIFICATIONS.each do |notification|
-          subscriber = ::ActiveSupport::Notifications.subscribe(notification) do |*args|
-            trace_event(::ActiveSupport::Notifications::Event.new(*args))
-          end
+        @subscriber_mutex.synchronize do
+          NOTIFICATIONS.each do |notification|
+            subscriber = ::ActiveSupport::Notifications.subscribe(notification) do |*args|
+              trace_event(::ActiveSupport::Notifications::Event.new(*args))
+            end
 
-          @subscribers.append(subscriber)
+            @subscribers.append(subscriber)
+          end
         end
       end
 
       def clear_subscribers
-        @subscribers.each do |s|
-          ::ActiveSupport::Notifications.unsubscribe(s)
-        end
+        @subscriber_mutex.synchronize do
+          @subscribers.each do |s|
+            ::ActiveSupport::Notifications.unsubscribe(s)
+          end
 
-        @subscribers.clear
+          @subscribers.clear
+        end
       end
 
       def trace_event(event)
@@ -96,5 +96,7 @@ module Grape
         span.log_kv(key: 'message', value: exception_object.message)
       end
     end
+    private_class_method :add_subscribers
+    private_class_method :clear_subscribers
   end
 end
