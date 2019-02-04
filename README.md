@@ -1,8 +1,13 @@
 # Grape::Instrumentation
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/grape/instrumentation`. To experiment with that code, run `bin/console` for an interactive prompt.
+This gem provides OpenTracing instrumentation for Grape by hooking into ActiveSupport notifications.
 
-TODO: Delete this and the text above, and describe your gem
+The following events are instrumented:
+- `endpoint_run.grape`
+- `endpoint_run_filters.grape`
+- `endpoint_run_validators.grape`
+- `endpoint_render.grape`
+- `format_response.grape`
 
 ## Installation
 
@@ -22,7 +27,24 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+```ruby
+require `grape/instrumentation`
+
+Grape::Instrumentation.instrument(tracer: OpenTracing.global_tracer, parent_span: ->(payload) { some_parent_span })
+```
+
+`Grape::Instrumentation.instrument` optionally takes these arguments:
+- `tracer`: OpenTracing tracer to be used for this instrumentation.
+  - Default: `OpenTracing.global_tracer`
+- `parent_span`: this can be a parent span, or a block that takes an argument,
+  `payload`, which is the notification event payload, and returns the that
+  should be used as the parent span.
+  - Example: `->(payload) { ::Grape::Instrumentation.tracer.active_span }`
+  - Default: `nil`
+
+The tracer is made available through `Grape::Instrumentation.tracer`.
+
+This instrumentation can be used in conjunction with [`Rack::Tracer`](https://github.com/opentracing-contrib/ruby-rack-tracer) to group spans by request.
 
 ## Development
 
