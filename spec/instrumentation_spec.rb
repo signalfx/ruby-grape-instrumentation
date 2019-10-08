@@ -8,7 +8,6 @@ RSpec.describe Grape::Instrumentation do
 
   describe 'Class Methods' do
     it { is_expected.to respond_to :instrument }
-    it { is_expected.to respond_to :add_subscribers }
     it { is_expected.to respond_to :trace_event }
     it { is_expected.to respond_to :tag_error }
   end
@@ -40,33 +39,34 @@ RSpec.describe Grape::Instrumentation do
       end
 
       it 'adds the correct tags for endpoint_run.grape' do
-        span = tracer.spans.detect { |e| e.operation_name = 'endpoint_run.grape' }
+        span = tracer.spans.detect { |e| e.operation_name == 'endpoint_run.grape' }
 
         expect(span.tags).to match common_tags
       end
 
       it 'adds the correct tags for endpoint_render.grape' do
-        span = tracer.spans.detect { |e| e.operation_name = 'endpoint_render.grape' }
+        span = tracer.spans.detect { |e| e.operation_name == 'endpoint_render.grape' }
 
         expect(span.tags).to match common_tags
       end
 
       it 'adds the correct tags for endpoint_run_filters.grape' do
-        span = tracer.spans.detect { |e| e.operation_name = 'endpoint_run_filters.grape' }
+        span = tracer.spans.detect { |e| e.operation_name == 'endpoint_run_filters.grape' }
 
         expect(span.tags).to match common_tags
       end
 
       it 'adds the correct tags for endpoint_run_validators.grape' do
-        span = tracer.spans.detect { |e| e.operation_name = 'endpoint_run_validators.grape' }
+        span = tracer.spans.detect { |e| e.operation_name == 'endpoint_run_validators.grape' }
 
         expect(span.tags).to match common_tags
       end
 
       it 'adds the correct tags for format_response.grape' do
-        span = tracer.spans.detect { |e| e.operation_name = 'format_response.grape' }
+        span = tracer.spans.detect { |e| e.operation_name == 'format_response.grape' }
 
-        expect(span.tags).to match common_tags
+        format_response_tags = { 'component' => 'ruby-grape', 'request.id' => anything }
+        expect(span.tags).to match format_response_tags
       end
     end
 
