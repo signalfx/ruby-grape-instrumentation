@@ -44,7 +44,7 @@ Grape::Instrumentation.instrument(tracer: OpenTracing.global_tracer, parent_span
 
 The tracer is made available through `Grape::Instrumentation.tracer`.
 
-This instrumentation can be used in conjunction with [`Rack::Tracer`](https://github.com/opentracing-contrib/ruby-rack-tracer) to group spans by request.
+This instrumentation can be used in conjunction with [`Rack::Tracer`](https://github.com/signalfx/ruby-rack-tracer) to group spans by request.
 
 ## Development
 
