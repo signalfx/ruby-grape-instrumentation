@@ -91,9 +91,7 @@ module Grape
       end
 
       def tag_error(span, exception_object)
-        span.set_tag('error', true)
-        span.log_kv(key: 'error.object', value: exception_object)
-        span.log_kv(key: 'message', value: exception_object.message)
+        span.record_exception(exception_object)
       end
     end
     private_class_method :add_subscribers

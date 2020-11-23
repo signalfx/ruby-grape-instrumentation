@@ -106,5 +106,37 @@ RSpec.describe Grape::Instrumentation do
         end
       end
     end
+
+    context 'when event with exception is received' do
+      before { described_class.instrument(tracer: tracer) }
+
+      after { described_class.uninstrument }
+      it 'it correctly records the error on span' do
+        error = nil
+        begin
+          raise StandardError, "test error"
+        rescue => err 
+          error = err
+        end
+        event = ActiveSupport::Notifications::Event.new(
+          "test-event", "", "", "1", {
+            :exception => ["StandardError", "Invalid value"],
+            :exception_object => err
+          }
+        )
+        described_class.trace_event event
+        span = tracer.spans.first
+
+        err_tags = {
+          'component' => 'ruby-grape',
+          'error' => true,
+          'request.id' => '1',
+          'sfx.error.kind' => 'StandardError',
+          'sfx.error.message' => 'test error',
+          'sfx.error.stack' => error.backtrace.join('\n')
+        }
+        expect(span.tags).to match err_tags
+      end
+    end
   end
 end
