@@ -14,7 +14,7 @@ The following events are instrumented:
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'grape-instrumentation'
+gem 'signalfx-grape-instrumentation'
 ```
 
 And then execute:
@@ -23,7 +23,7 @@ And then execute:
 
 Or install it yourself as:
 
-    $ gem install grape-instrumentation
+    $ gem install signalfx-grape-instrumentation
 
 ## Usage
 
