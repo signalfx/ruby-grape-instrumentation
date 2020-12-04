@@ -1,7 +1,7 @@
 require 'bundler/setup'
 require 'grape'
 require 'grape/instrumentation'
-require 'opentracing_test_tracer'
+require 'signalfx_test_tracer'
 require 'rack/test'
 
 RSpec.configure do |config|
